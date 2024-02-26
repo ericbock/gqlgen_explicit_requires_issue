@@ -1,0 +1,42 @@
+# Federation directives.
+extend schema
+@link(
+  url: "https://specs.apollo.dev/federation/v2.4"
+  import: [
+    "@extends"
+    "@external"
+    "@key"
+    "@inaccessible"
+    "@override"
+    "@provides"
+    "@requires"
+    "@shareable"
+    "@tag"
+    "@interfaceObject"
+  ]
+)
+
+directive @goField(
+  forceResolver: Boolean
+  name: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type User @key(fields: "id") {
+  id: ID!
+  name: String!
+  pets: [Pet!]! @goField(forceResolver: true)
+  petNames: [String!]! @requires(fields: "pets { name }")
+}
+
+type Pet @key(fields: "id", resolvable: false) {
+  id: ID!
+  name: String @external
+}
+
+type Query {
+  users: [User!]!
+}
